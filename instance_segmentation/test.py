@@ -1,3 +1,4 @@
+
 import numpy as np
 import cv2
 import albumentations as A
@@ -176,30 +177,40 @@ def execute_one_aug(image,masks,custom_pipeline,pipelines):
             image,masks = custom_pipeline[index][0](image,masks,**custom_pipeline[index][1])
     return image,masks
 
-def temp_run(today,full_save_path,annotation_id_queue,image_id_queue):
+def temp_run(process_index,annotation_id_queue,image_id_queue,output_queue):
     log = load_log()
     label_file_path = log["label_file_path"]
     images_folder = log["images_folder"]
     save_folder = log["save_folder"]
+    folder_count=1
     custom_pipeline = make_custom_aug_pipeline(log)
     pipelines = make_albumentation_pipeline(log)
     coco_data,categories = read_json(label_file_path,images_folder)
     coco_data,categories = read_json(label_file_path,images_folder)
+    today = str(datetime.now())
+    today = today.split(" ")[0]
+    while True:
+        if not os.path.isdir(save_folder+"/{}-{}".format(today,folder_count)):
+            break
+        else:
+            folder_count+=1
+    full_save_path = save_folder+"/"+today+"-"+str(folder_count-1)
+    
     images=[]
     annotations=[]
-    number=1
-    annotation_number = 1
-    folder_count=1
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    print("시작한다!!!!!!!!!!!!")
     for index,item in enumerate(coco_data):
         pre_image_origin,pre_masks_origin,pre_categories_about_one_mask = item
-        for j in range(int(int(log["aug_nums"])//int(log["nums_process"]))+1):
+        # for j in range(int(int(log["aug_nums"])//int(log["nums_process"]))+1):
+        for j in range(1):
+            number = image_id_queue.get()
             t = "_".join(str(time.time()).split("."))
             result_image = copy.deepcopy(pre_image_origin)
             result_masks = copy.deepcopy(pre_masks_origin)
             result_image,result_masks = execute_one_aug(result_image,result_masks,custom_pipeline,pipelines)
             result_polygons,result_categories_about_one_mask,result_image = masks2polygons(result_masks,pre_categories_about_one_mask,result_image=result_image,dummy_image_list=None)
             for polygon,one_category_num in zip(result_polygons,result_categories_about_one_mask):
+                annotation_number = annotation_id_queue.get()
                 x,y,w,h = cv2.boundingRect(polygon)
                 area = int(cv2.contourArea(polygon))
                 seg = [ int(i) for i in polygon.reshape(-1)]
@@ -219,23 +230,26 @@ def temp_run(today,full_save_path,annotation_id_queue,image_id_queue):
                     "height":result_image.shape[0],
                     "width":result_image.shape[1],
                     "id":number,
-                    "file_name":t+".jpg",
+                    "file_name":str(process_index)+"_"+t+".jpg",
                 })
-            number+=1
             cv2.drawContours(result_image,result_polygons,-1,(255,0,0),thickness=2,)
-            cv2.imwrite(full_save_path+"/{}.jpg".format(t),result_image)
+            print(full_save_path+"/{}{}.jpg".format(str(process_index)+"_",t))
+            print(result_image.shape)
+            cv2.imwrite(full_save_path+"/{}{}.jpg".format(str(process_index)+"_",t),result_image)
             del result_image,result_masks, result_polygons,result_categories_about_one_mask
-    # result_object = {
-    #     "images":images,
-    #     "annotations":annotations,
-    #     "categories":categories,
-    #     }
+    result_object = {
+        "images":images,
+        "annotations":annotations,
+        "categories":categories,
+        }
+    output_queue.put(result_object)
     # with open('{}/data.json'.format(full_save_path), 'w') as f:
     #     json_string = json.dump(result_object, f, indent=2)
 
 
 
 if __name__=="__main__":
+    process_num = 4
     log = load_log()
     save_folder = log["save_folder"]
     label_file_path = log["label_file_path"]
@@ -243,6 +257,7 @@ if __name__=="__main__":
     save_folder = log["save_folder"]
     today = str(datetime.now())
     today = today.split(" ")[0]
+    output_queue = Queue()
     annotation_id_queue = Queue()
     image_id_queue = Queue()
     for i in range(10**7):
@@ -265,13 +280,31 @@ if __name__=="__main__":
             break
         else:
             folder_count+=1
-            
-    for _ in range(4):
-        p1 = Process(target=temp_run,args=("123",full_save_path ,annotation_id_queue,image_id_queue))
-        p2 = Process(target=temp_run,args=("123",full_save_path ,annotation_id_queue,image_id_queue))
-        p3 = Process(target=temp_run,args=("123",full_save_path ,annotation_id_queue,image_id_queue))
-        p4 = Process(target=temp_run,args=("123",full_save_path ,annotation_id_queue,image_id_queue))
-        p1.start()
-        p2.start()
-        p3.start()
-        p4.start()
+    
+    p_list =[]    
+    for index in range(process_num):
+        p = Process(target=temp_run,args=(index,annotation_id_queue,image_id_queue,output_queue))
+        p.start()
+        p_list.append(p)
+
+    images = []
+    annotations = []
+    process_num = process_num
+    while_count=0
+    while True:
+        if process_num<=while_count:
+            break
+        result_object = output_queue.get()
+        images+=result_object["images"]
+        annotations+=result_object["annotations"]
+        while_count+=1
+    result_object = {
+        "images":images,
+        "annotations":annotations,
+        "categories":categories,
+        }
+    for index in range(process_num):
+        p_list[index].terminate()
+    with open('{}/data.json'.format(full_save_path), 'w') as f:
+        json_string = json.dump(result_object, f, indent=2)
+    exit()

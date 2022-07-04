@@ -6,8 +6,8 @@ background_probability: 44
 background_strength: 5
 blur_probability: 50
 blur_strength: 5
-brightness_probability: 50
-brightness_strength: 25
+brightness_probability: 100
+brightness_strength: 10
 colorjitter_probability: 50
 colorjitter_strength: 50
 downscale_probability: 50
@@ -25,12 +25,12 @@ mixup_probability: 50
 mixup_strength: 50
 noise_probability: 50
 noise_strength: 25
-nums_process: '5'
+nums_process: '4'
 opticaldistortion_probability: 50
 opticaldistortion_strength: 5
 perspective_probability: 50
 perspective_strength: 15
 resize_probability: 50
 resize_strength: 15
-save_folder: C:/Users/user/OneDrive/Desktop/Inseg_aug/train_short_good_bad_/output
+save_folder: C:/Users/user/OneDrive/Desktop/Inseg_aug/output
 verticalflip_probability: 50

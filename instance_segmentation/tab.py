@@ -1,9 +1,8 @@
-from multiprocessing import Queue
 from threading import Thread
 from PySide6.QtWidgets import QFrame,QLabel,QPushButton,QVBoxLayout,QCheckBox,QSlider,QHBoxLayout,QGridLayout,QWidget,QFileDialog,QLineEdit
 from PySide6.QtCore import Qt,QSize
 from PySide6.QtGui import QPixmap
-from multiprocessing import Process
+from multiprocessing import Process,Queue
 
 import albumentations as A
 from instance_segmentation.utils import read_json
