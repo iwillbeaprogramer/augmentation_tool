@@ -1,4 +1,5 @@
 gradation_images
 .jpg
 .bmp
-.train_short_good_bad
+.json
+train_short_good_bad/

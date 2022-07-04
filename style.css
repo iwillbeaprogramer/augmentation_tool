@@ -1,0 +1,31 @@
+.QLabel_ {{
+    color: {QTMATERIAL_SECONDARYCOLOR};
+    text-transform: none;
+    background-color: {QTMATERIAL_PRIMARYCOLOR};
+  }}
+  
+  .big_button {{
+    height: 64px;
+  }}
+
+.title {{
+    color: {QTMATERIAL_PRIMARYCOLOR};
+    background-color: #050505;
+}}
+ 
+.dialog{{
+    color: {QTMATERIAL_PRIMARYCOLOR};
+    font-family: "Roboto";
+    font-size: 14px;
+    font-weight: bold;
+    margin: 10;
+}}
+
+.error{{
+    color: {QTMATERIAL_PRIMARYCOLOR};
+    font-family: "Roboto";
+    font-size: 14px;
+    font-weight: bold;
+    background-color: {QTMATERIAL_SECONDARYCOLOR} ;
+    margin: 10;
+}}
