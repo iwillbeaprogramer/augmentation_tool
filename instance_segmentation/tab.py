@@ -220,7 +220,7 @@ class InstanceSegmentation_Tab(QFrame):
             json_string = json.dump(result_object, f, indent=2)
             
     def MULTI_AUGMENTATION_RUN(self):
-        main()
+            main()
 
     def execute_one_aug(self,image,masks):
         random.shuffle(self.custom_pipeline)

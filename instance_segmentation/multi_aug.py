@@ -8,7 +8,7 @@ import os
 import random
 import copy
 import sys
-from multiprocessing import Process,Queue
+from multiprocessing import Process,Queue, freeze_support
 from threading import Thread
 from datetime import datetime
 
@@ -198,7 +198,7 @@ def temp_run(process_index,annotation_id_queue,image_id_queue,output_queue):
     
     images=[]
     annotations=[]
-    print("시작한다!!!!!!!!!!!!")
+
     for index,item in enumerate(coco_data):
         pre_image_origin,pre_masks_origin,pre_categories_about_one_mask = item
         for j in range(int(int(log["aug_nums"])//int(log["nums_process"]))+1):
@@ -233,9 +233,7 @@ def temp_run(process_index,annotation_id_queue,image_id_queue,output_queue):
                     "id":number,
                     "file_name":str(process_index)+"_"+t+".jpg",
                 })
-            cv2.drawContours(result_image,result_polygons,-1,(255,0,0),thickness=2,)
-            print(full_save_path+"/{}{}.jpg".format(str(process_index)+"_",t))
-            print(result_image.shape)
+            # cv2.drawContours(result_image,result_polygons,-1,(255,0,0),thickness=2,)
             cv2.imwrite(full_save_path+"/{}{}.jpg".format(str(process_index)+"_",t),result_image)
             del result_image,result_masks, result_polygons,result_categories_about_one_mask
     result_object = {
@@ -244,6 +242,7 @@ def temp_run(process_index,annotation_id_queue,image_id_queue,output_queue):
         "categories":categories,
         }
     output_queue.put(result_object)
+    return
 
 def main():
     log = load_log()
@@ -280,13 +279,12 @@ def main():
     
     p_list =[]    
     for index in range(process_num):
-        p = Process(target=temp_run,args=(index,annotation_id_queue,image_id_queue,output_queue))
+        p = Process(target=temp_run,args=(index,annotation_id_queue,image_id_queue,output_queue),daemon=True,)
         p.start()
         p_list.append(p)
 
     images = []
     annotations = []
-    process_num = process_num
     while_count=0
     while True:
         if process_num<=while_count:
@@ -302,9 +300,16 @@ def main():
         }
     with open('{}/data.json'.format(full_save_path), 'w') as f:
         json_string = json.dump(result_object, f, indent=2)
-    
+    annotation_id_queue.close()
+    image_id_queue.close()
+    output_queue.close()
+    for p in p_list:
+        p.close()
+    print("진짜끝")
+    exit()
     
     
     
 if __name__=="__main__":
+    freeze_support()
     main()
