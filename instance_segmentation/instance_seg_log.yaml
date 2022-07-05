@@ -1,13 +1,13 @@
 affine_probability: 50
 affine_strength: 15
-aug_nums: '10'
+aug_nums: '6'
 background_path: null
 background_probability: 44
 background_strength: 5
 blur_probability: 50
 blur_strength: 5
 brightness_probability: 100
-brightness_strength: 10
+brightness_strength: 5
 colorjitter_probability: 50
 colorjitter_strength: 50
 downscale_probability: 50
@@ -25,7 +25,7 @@ mixup_probability: 50
 mixup_strength: 50
 noise_probability: 50
 noise_strength: 25
-nums_process: '4'
+nums_process: '3'
 opticaldistortion_probability: 50
 opticaldistortion_strength: 5
 perspective_probability: 50

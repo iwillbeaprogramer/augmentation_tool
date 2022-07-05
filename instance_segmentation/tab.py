@@ -15,7 +15,7 @@ from instance_segmentation.augmentation import *
 from instance_segmentation.utils import masks2polygons
 import yaml
 import json
-
+from instance_segmentation.multi_aug import main
 
 class InstanceSegmentation_Tab(QFrame):
     def __init__(self,WIDTH,HEIGHT):
@@ -112,7 +112,7 @@ class InstanceSegmentation_Tab(QFrame):
             "label_file_path" : self.label_file_path,
             "background_path" : self.background_path,
             "save_folder" : self.save_folder,
-            "nums_process" : self.process_edit.text(),
+            "nums_process" : int(self.process_edit.text()),
             "aug_nums":self.line_edit.text(),
             "resize_probability":self.resize_slider_probability.value(),
             "resize_strength":self.resize_slider.value(),
@@ -218,6 +218,9 @@ class InstanceSegmentation_Tab(QFrame):
             }
         with open('{}/data.json'.format(full_save_path), 'w') as f:
             json_string = json.dump(result_object, f, indent=2)
+            
+    def MULTI_AUGMENTATION_RUN(self):
+        main()
 
     def execute_one_aug(self,image,masks):
         random.shuffle(self.custom_pipeline)
@@ -478,7 +481,7 @@ class InstanceSegmentation_Tab(QFrame):
         
     def make_run_button(self):
         run_button = QPushButton("Aug 실행")
-        run_button.clicked.connect(self.AUGMENTATION_RUN)
+        run_button.clicked.connect(self.MULTI_AUGMENTATION_RUN)
         self.grid_layout.addWidget(run_button,self.aug_count,0,1,3)
         self.aug_count+=1
         self.start_time = time.time()

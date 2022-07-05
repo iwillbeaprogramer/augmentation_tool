@@ -14,9 +14,9 @@ def masks_sum(masks):
     else:
         return masks[0]
 
-def random_background_change(image,masks,p=0.5,patch_image=None,):
+def random_background_change(image,masks,labels,p=0.5,patch_image=None,):
     if random.random()<p:
-        return image,masks
+        return image,masks,labels
     else:
         if patch_image is not None:
             patch_nums = random.randint(1,10)
@@ -51,7 +51,7 @@ def random_background_change(image,masks,p=0.5,patch_image=None,):
                     else:
                         x_end+=a
                         y_end+=b
-            return result_image,masks
+            return result_image,masks,labels
         else:
             patch_nums = random.randint(1,10)
             result_image = image.copy()
@@ -84,23 +84,24 @@ def random_background_change(image,masks,p=0.5,patch_image=None,):
                     else:
                         x_end+=a
                         y_end+=b
-            return result_image,masks
+            return result_image,masks,labels
 
 
-def random_dropout(image,masks,p=0.5,min_instance=1,max_instance=5,mixup_image=False):
+def random_dropout(image,masks,labels,p=0.5,min_instance=1,max_instance=5,mixup_image=False):
     if random.random()<p:
-        return image,masks
+        return image,masks,labels
     else:
         return_image = image.copy()
         dropout_nums = random.randint(min_instance,max_instance)
         masks_num = len(masks)
         if dropout_nums>masks_num:
             if masks_num<=1:
-                return image,masks
+                return image,masks,labels
             else:
                 dropout_nums = 1
         temp = np.random.choice(len(masks),dropout_nums)
         return_masks = [ mask for index,mask in enumerate(masks) if index not in temp]
+        result_labels = [ label for index,label in enumerate(labels) if index not in temp]
         for index in temp:
             mask = masks[index]
             if mixup_image:
@@ -119,20 +120,20 @@ def random_dropout(image,masks,p=0.5,min_instance=1,max_instance=5,mixup_image=F
                     color= np.array([random.randint(0,93)+random.choice([0,162]),random.randint(0,93)+random.choice([0,162]),random.randint(0,93)+random.choice([0,162])]).astype(np.uint8)
                     return_image[y_min:y_max,x_min:x_max,:]=color
                     
-        return return_image,return_masks
+        return return_image,return_masks,result_labels
 
-def random_mixup(image,masks=[],p=0.5,HISTOGRAM_IMAGE_LIST=None):
+def random_mixup(image,masks,labels,p=0.5,HISTOGRAM_IMAGE_LIST=None):
     if random.random()<p:
         image_ = image.copy()
         a = random.random()*0.25+0.75
         if isinstance(HISTOGRAM_IMAGE_LIST,list):
             pass
         else:
-            return image,masks
+            return image,masks,labels
         if random.random()<0.5:
             random_indexes = np.random.choice(len(HISTOGRAM_IMAGE_LIST)-1,1)
             mixup_image = [ cv2.imread(HISTOGRAM_IMAGE_LIST[random_index]) for random_index in random_indexes][0]
-            return cv2.addWeighted(image_,a,cv2.resize(mixup_image,(image_.shape[1],image_.shape[0])),1-a,0)
+            return cv2.addWeighted(image_,a,cv2.resize(mixup_image,(image_.shape[1],image_.shape[0])),1-a,0),masks,labels
         else:
             random_indexes = np.random.choice(len(HISTOGRAM_IMAGE_LIST)-1,4)
             images_list = [ cv2.imread(HISTOGRAM_IMAGE_LIST[random_index]) for random_index in random_indexes]
@@ -145,12 +146,12 @@ def random_mixup(image,masks=[],p=0.5,HISTOGRAM_IMAGE_LIST=None):
             result1 = np.concatenate([temp1,temp2],axis=1)
             result2 = np.concatenate([temp3,temp4],axis=1)
             mixup_image = np.concatenate([result1,result2],axis=0)
-        return cv2.addWeighted(image_,a,cv2.resize(mixup_image,(image_.shape[1],image_.shape[0])),1-a,0),masks
+        return cv2.addWeighted(image_,a,cv2.resize(mixup_image,(image_.shape[1],image_.shape[0])),1-a,0),masks,labels
     else:
-        return image,masks
+        return image,masks,labels
 
 
-def random_part_resize(image,masks,p=0.5):
+def random_part_resize(image,masks,labels,p=0.5):
     if random.random()<p:
         if random.random()<0.5:
             H,W = image.shape[:2]
@@ -171,7 +172,7 @@ def random_part_resize(image,masks,p=0.5):
                     mask_list.append(cv2.resize(temp,(temp.shape[1],round(temp.shape[0]*random_size[index]))))
                 result_masks_list.append(np.concatenate(mask_list,axis=0).astype(np.uint8))
             result_image = np.concatenate(part_list,axis=0).astype(np.uint8)
-            return result_image,result_masks_list
+            return result_image,result_masks_list,labels
         else:
             H,W = image.shape[:2]
             part_num = random.randint(5,9)
@@ -191,9 +192,9 @@ def random_part_resize(image,masks,p=0.5):
                     mask_list.append(cv2.resize(temp,(round(temp.shape[1]*random_size[index]),round(temp.shape[0]))))
                 result_masks_list.append(np.concatenate(mask_list,axis=1).astype(np.uint8))
             result_image = np.concatenate(part_list,axis=1).astype(np.uint8)
-            return result_image,result_masks_list
+            return result_image,result_masks_list,labels
     else:
-        return image,masks
+        return image,masks,labels
 
 
 def make_gradation_images(rgb=(255,255,255)):
@@ -270,7 +271,7 @@ def make_gradation_images(rgb=(255,255,255)):
     
 
 
-def random_gradation(image,masks=[],p=0.5,gradation_intensity=0.25,):
+def random_gradation(image,masks,labels,p=0.5,gradation_intensity=0.25,):
     make_gradation_images()
     possibility = random.random()
     if p<possibility:
@@ -285,9 +286,9 @@ def random_gradation(image,masks=[],p=0.5,gradation_intensity=0.25,):
         temp = cv2.resize(temp,dsize=(image.shape[1],image.shape[0]))
         ratio = random.random()*gradation_intensity+1-gradation_intensity
         result = cv2.addWeighted(image,ratio,temp,1-ratio,0)
-        return result,masks
+        return result,masks,labels
     else:
-        return image,masks
+        return image,masks,labels
 
 
 
@@ -326,7 +327,7 @@ def liquify(img, cx1,cy1, cx2,cy2,half):
     img[y:y+h, x:x+w] = out
     return img 
 
-def random_grid_distortion(image,masks=[],p=0.5,distort_intensity=0.20,):
+def random_grid_distortion(image,masks,labels,p=0.5,distort_intensity=0.20,):
     if random.random()<p:
         random_box_num = random.randint(5,10)
         data = []
@@ -348,7 +349,7 @@ def random_grid_distortion(image,masks=[],p=0.5,distort_intensity=0.20,):
             
             result_image = liquify(image,x_mid,y_mid,x_mid+tx,y_mid+ty,half)
             masks = [ liquify(mask,x_mid,y_mid,x_mid+tx,y_mid+ty,half) for index,mask in enumerate(masks)]
-        return result_image,masks
+        return result_image,masks,labels
             
     else:
-        return image,masks
+        return image,masks,labels
