@@ -4,3 +4,4 @@ gradation_images
 .json
 train_short_good_bad_/
 output/
+instance_seg_log.yaml

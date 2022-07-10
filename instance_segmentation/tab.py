@@ -75,36 +75,72 @@ class InstanceSegmentation_Tab(QFrame):
             self.save_folder = self.log["save_folder"]
             self.line_edit.setText(self.log["aug_nums"])
             self.process_edit.setText(str(self.log["nums_process"]))
+            
+            
             self.resize_slider_probability.setValue(self.log["resize_probability"])
             self.resize_slider.setValue(self.log["resize_strength"]),
+            self.resize_checkbox.setChecked(self.log["resize_apply"])
+            
             self.dropout_slider_probability.setValue(self.log["dropout_probability"]),
             self.dropout_slider.setValue(self.log["dropout_strength"])
+            self.dropout_checkbox.setChecked(self.log["dropout_apply"])
+            
+            
             self.background_slider_probability.setValue(self.log['background_probability'])
             self.background_slider.setValue(self.log['background_strength'])
+            self.background_checkbox.setChecked(self.log["background_apply"])
+            
             self.griddistortion_slider_probability.setValue(self.log["griddistortion_probability"])
             self.griddistortion_slider.setValue(self.log["griddistortion_strength"]),
+            self.griddistortion_checkbox.setChecked(self.log["griddistortion_apply"])
+            
+            
             self.brightness_slider_probability.setValue(self.log["brightness_probability"]),
             self.brightness_slider.setValue(self.log["brightness_strength"]),
+            self.brightness_checkbox.setChecked(self.log["brightness_apply"])
+            
             self.blur_slider_probability.setValue(self.log["blur_probability"]),
             self.blur_slider.setValue(self.log["blur_strength"]),
+            self.blur_checkbox.setChecked(self.log["blur_apply"])
+            
             self.noise_slider_probability.setValue(self.log["noise_probability"]),
             self.noise_slider.setValue(self.log["noise_strength"]),
+            self.noise_checkbox.setChecked(self.log["noise_apply"])
+            
             self.horizentalflip_slider_probability.setValue(self.log["horizentalflip_probability"]),
+            self.horizentalflip_checkbox.setChecked(self.log["horizentalflip_apply"])
+            
             self.verticalflip_slider_probability.setValue(self.log["verticalflip_probability"]),
+            self.verticalflip_checkbox.setChecked(self.log["verticalflip_apply"])
+            
             self.downscale_slider_probability.setValue(self.log["downscale_probability"]),
             self.downscale_slider.setValue(self.log["downscale_strength"]),
+            self.downscale_checkbox.setChecked(self.log["downscale_apply"])
+            
             self.mixup_slider_probability.setValue(self.log["mixup_probability"]),
             self.mixup_slider.setValue(self.log["mixup_strength"]),
+            self.mixup_checkbox.setChecked(self.log["mixup_apply"])
+            
             self.colorjitter_slider_probability.setValue(self.log["colorjitter_probability"]),
             self.colorjitter_slider.setValue(self.log["colorjitter_strength"]),
+            self.colorjitter_checkbox.setChecked(self.log["colorjitter_apply"])
+            
             self.optical_slider_probability.setValue(self.log["opticaldistortion_probability"]),
             self.optical_slider.setValue(self.log["opticaldistortion_strength"]),
-            self.resize_slider_probability.setValue(self.log["gradation_probability"]),
+            self.optical_checkbox.setChecked(self.log["opticaldistortion_apply"])
+            
+            self.gradation_slider_probability.setValue(self.log["gradation_probability"]),
             self.gradation_slider.setValue(self.log["gradation_strength"]),
-            self.resize_slider_probability.setValue(self.log["affine_probability"]),
+            self.gradation_checkbox.setChecked(self.log["gradation_apply"])
+            
+            
+            self.affine_slider_probability.setValue(self.log["affine_probability"]),
             self.affine_slider.setValue(self.log["affine_strength"]),
-            self.resize_slider_probability.setValue(self.log["perspective_probability"]),
+            self.affine_checkbox.setChecked(self.log["affine_apply"])
+            
+            self.perspective_slider_probability.setValue(self.log["perspective_probability"]),
             self.perspective_slider.setValue(self.log["perspective_strength"]),
+            self.perspective_checkbox.setChecked(self.log["perspective_apply"])
     
     def save_log(self):
         instance_seg_log = {
@@ -114,36 +150,68 @@ class InstanceSegmentation_Tab(QFrame):
             "save_folder" : self.save_folder,
             "nums_process" : int(self.process_edit.text()),
             "aug_nums":self.line_edit.text(),
+            
             "resize_probability":self.resize_slider_probability.value(),
             "resize_strength":self.resize_slider.value(),
+            "resize_apply":self.resize_checkbox.isChecked(),
+            
             "dropout_probability":self.dropout_slider_probability.value(),
             "dropout_strength":self.dropout_slider.value(),
+            "dropout_apply":self.dropout_checkbox.isChecked(),
+            
             "background_probability":self.background_slider_probability.value(),
             "background_strength":self.background_slider.value(),
+            "background_apply":self.background_checkbox.isChecked(),
+            
             "griddistortion_probability":self.griddistortion_slider_probability.value(),
             "griddistortion_strength":self.griddistortion_slider.value(),
+            "griddistortion_apply":self.griddistortion_checkbox.isChecked(),
+            
             "brightness_probability":self.brightness_slider_probability.value(),
             "brightness_strength":self.brightness_slider.value(),
+            "brightness_apply":self.brightness_checkbox.isChecked(),
+            
             "blur_probability":self.blur_slider_probability.value(),
             "blur_strength":self.blur_slider.value(),
+            "blur_apply":self.blur_checkbox.isChecked(),
+            
             "noise_probability":self.noise_slider_probability.value(),
             "noise_strength":self.noise_slider.value(),
+            "noise_apply":self.noise_checkbox.isChecked(),
+            
             "horizentalflip_probability":self.horizentalflip_slider_probability.value(),
-            "verticalflip_probability":self.resize_slider_probability.value(),
-            "downscale_probability":self.resize_slider_probability.value(),
+            "horizentalflip_apply":self.horizentalflip_checkbox.isChecked(),
+            
+            "verticalflip_probability":self.verticalflip_slider_probability.value(),
+            "verticalflip_apply":self.verticalflip_checkbox.isChecked(),
+            
+            "downscale_probability":self.downscale_slider_probability.value(),
             "downscale_strength":self.downscale_slider.value(),
-            "mixup_probability":self.resize_slider_probability.value(),
+            "downscale_apply":self.downscale_checkbox.isChecked(),
+            
+            "mixup_probability":self.mixup_slider_probability.value(),
             "mixup_strength":self.mixup_slider.value(),
-            "colorjitter_probability":self.resize_slider_probability.value(),
+            "mixup_apply":self.mixup_checkbox.isChecked(),
+            
+            "colorjitter_probability":self.colorjitter_slider_probability.value(),
             "colorjitter_strength":self.colorjitter_slider.value(),
-            "opticaldistortion_probability":self.resize_slider_probability.value(),
+            "colorjitter_apply":self.colorjitter_checkbox.isChecked(),
+            
+            "opticaldistortion_probability":self.optical_slider_probability.value(),
             "opticaldistortion_strength":self.optical_slider.value(),
+            "opticaldistortion_apply":self.optical_checkbox.isChecked(),
+            
             "gradation_probability":self.resize_slider_probability.value(),
             "gradation_strength":self.gradation_slider.value(),
+            "gradation_apply":self.gradation_checkbox.isChecked(),
+            
             "affine_probability":self.resize_slider_probability.value(),
             "affine_strength":self.affine_slider.value(),
+            "affine_apply":self.affine_checkbox.isChecked(),
+            
             "perspective_probability":self.resize_slider_probability.value(),
             "perspective_strength":self.perspective_slider.value(),
+            "perspective_apply":self.perspective_checkbox.isChecked(),
         }
         with open("instance_segmentation/instance_seg_log.yaml","w") as f:
             yaml.dump(instance_seg_log,f)
