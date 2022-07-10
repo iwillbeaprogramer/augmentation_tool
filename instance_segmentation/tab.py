@@ -68,43 +68,43 @@ class InstanceSegmentation_Tab(QFrame):
     def load_log(self):
         if os.path.isfile("instance_segmentation/instance_seg_log.yaml"):
             with open("instance_segmentation/instance_seg_log.yaml","r") as f:
-                log = yaml.load(f,yaml.FullLoader)
-            self.background_path = log["background_path"]
-            self.images_folder = log["images_folder"]
-            self.label_file_path = log["label_file_path"]
-            self.save_folder = log["save_folder"]
-            self.line_edit.setText(log["aug_nums"])
-            self.process_edit.setText(log["nums_process"])
-            self.resize_slider_probability.setValue(log["resize_probability"])
-            self.resize_slider.setValue(log["resize_strength"]),
-            self.dropout_slider_probability.setValue(log["dropout_probability"]),
-            self.dropout_slider.setValue(log["dropout_strength"])
-            self.background_slider_probability.setValue(log['background_probability'])
-            self.background_slider.setValue(log['background_strength'])
-            self.griddistortion_slider_probability.setValue(log["griddistortion_probability"])
-            self.griddistortion_slider.setValue(log["griddistortion_strength"]),
-            self.brightness_slider_probability.setValue(log["brightness_probability"]),
-            self.brightness_slider.setValue(log["brightness_strength"]),
-            self.blur_slider_probability.setValue(log["blur_probability"]),
-            self.blur_slider.setValue(log["blur_strength"]),
-            self.noise_slider_probability.setValue(log["noise_probability"]),
-            self.noise_slider.setValue(log["noise_strength"]),
-            self.horizentalflip_slider_probability.setValue(log["horizentalflip_probability"]),
-            self.verticalflip_slider_probability.setValue(log["verticalflip_probability"]),
-            self.downscale_slider_probability.setValue(log["downscale_probability"]),
-            self.downscale_slider.setValue(log["downscale_strength"]),
-            self.mixup_slider_probability.setValue(log["mixup_probability"]),
-            self.mixup_slider.setValue(log["mixup_strength"]),
-            self.colorjitter_slider_probability.setValue(log["colorjitter_probability"]),
-            self.colorjitter_slider.setValue(log["colorjitter_strength"]),
-            self.optical_slider_probability.setValue(log["opticaldistortion_probability"]),
-            self.optical_slider.setValue(log["opticaldistortion_strength"]),
-            self.resize_slider_probability.setValue(log["gradation_probability"]),
-            self.gradation_slider.setValue(log["gradation_strength"]),
-            self.resize_slider_probability.setValue(log["affine_probability"]),
-            self.affine_slider.setValue(log["affine_strength"]),
-            self.resize_slider_probability.setValue(log["perspective_probability"]),
-            self.perspective_slider.setValue(log["perspective_strength"]),
+                self.log = yaml.load(f,yaml.FullLoader)
+            self.background_path = self.log["background_path"]
+            self.images_folder = self.log["images_folder"]
+            self.label_file_path = self.log["label_file_path"]
+            self.save_folder = self.log["save_folder"]
+            self.line_edit.setText(self.log["aug_nums"])
+            self.process_edit.setText(str(self.log["nums_process"]))
+            self.resize_slider_probability.setValue(self.log["resize_probability"])
+            self.resize_slider.setValue(self.log["resize_strength"]),
+            self.dropout_slider_probability.setValue(self.log["dropout_probability"]),
+            self.dropout_slider.setValue(self.log["dropout_strength"])
+            self.background_slider_probability.setValue(self.log['background_probability'])
+            self.background_slider.setValue(self.log['background_strength'])
+            self.griddistortion_slider_probability.setValue(self.log["griddistortion_probability"])
+            self.griddistortion_slider.setValue(self.log["griddistortion_strength"]),
+            self.brightness_slider_probability.setValue(self.log["brightness_probability"]),
+            self.brightness_slider.setValue(self.log["brightness_strength"]),
+            self.blur_slider_probability.setValue(self.log["blur_probability"]),
+            self.blur_slider.setValue(self.log["blur_strength"]),
+            self.noise_slider_probability.setValue(self.log["noise_probability"]),
+            self.noise_slider.setValue(self.log["noise_strength"]),
+            self.horizentalflip_slider_probability.setValue(self.log["horizentalflip_probability"]),
+            self.verticalflip_slider_probability.setValue(self.log["verticalflip_probability"]),
+            self.downscale_slider_probability.setValue(self.log["downscale_probability"]),
+            self.downscale_slider.setValue(self.log["downscale_strength"]),
+            self.mixup_slider_probability.setValue(self.log["mixup_probability"]),
+            self.mixup_slider.setValue(self.log["mixup_strength"]),
+            self.colorjitter_slider_probability.setValue(self.log["colorjitter_probability"]),
+            self.colorjitter_slider.setValue(self.log["colorjitter_strength"]),
+            self.optical_slider_probability.setValue(self.log["opticaldistortion_probability"]),
+            self.optical_slider.setValue(self.log["opticaldistortion_strength"]),
+            self.resize_slider_probability.setValue(self.log["gradation_probability"]),
+            self.gradation_slider.setValue(self.log["gradation_strength"]),
+            self.resize_slider_probability.setValue(self.log["affine_probability"]),
+            self.affine_slider.setValue(self.log["affine_strength"]),
+            self.resize_slider_probability.setValue(self.log["perspective_probability"]),
+            self.perspective_slider.setValue(self.log["perspective_strength"]),
     
     def save_log(self):
         instance_seg_log = {
@@ -183,8 +183,9 @@ class InstanceSegmentation_Tab(QFrame):
                 t = "_".join(str(time.time()).split("."))
                 result_image = copy.deepcopy(pre_image_origin)
                 result_masks = copy.deepcopy(pre_masks_origin)
-                result_image,result_masks = self.execute_one_aug(result_image,result_masks)
-                result_polygons,result_categories_about_one_mask,result_image = masks2polygons(result_masks,pre_categories_about_one_mask,result_image=result_image,dummy_image_list=None)
+                result_labels = copy.deepcopy(pre_categories_about_one_mask)
+                result_image,result_masks,result_labels = self.execute_one_aug(result_image,result_masks,result_labels)
+                result_polygons,result_categories_about_one_mask,result_image = masks2polygons(result_masks,result_labels,result_image=result_image,dummy_image_list=None)
                 for polygon,one_category_num in zip(result_polygons,result_categories_about_one_mask):
                     x,y,w,h = cv2.boundingRect(polygon)
                     area = int(cv2.contourArea(polygon))
@@ -220,9 +221,15 @@ class InstanceSegmentation_Tab(QFrame):
             json_string = json.dump(result_object, f, indent=2)
             
     def MULTI_AUGMENTATION_RUN(self):
+        self.save_log()
+        self.load_log()
+        if self.log["nums_process"]<2:
+            self.AUGMENTATION_RUN()
+        else:
             main()
+        
 
-    def execute_one_aug(self,image,masks):
+    def execute_one_aug(self,image,masks,labels):
         random.shuffle(self.custom_pipeline)
         random.shuffle(self.pipelines)
         temp = [-1]+list(range(len(self.custom_pipeline)))
@@ -234,8 +241,8 @@ class InstanceSegmentation_Tab(QFrame):
                 masks = transformed['masks']
             else:
                 # image,masks = self.custom_pipeline[index][0](image,masks=masks,p=self.custom_pipeline[index][1],)
-                image,masks = self.custom_pipeline[index][0](image,masks,**self.custom_pipeline[index][1])
-        return image,masks
+                image,masks,labels = self.custom_pipeline[index][0](image,masks,labels,**self.custom_pipeline[index][1])
+        return image,masks,labels
         
     def make_custom_aug_pipeline(self):
         custom_pipeline=[]

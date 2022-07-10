@@ -25,7 +25,7 @@ mixup_probability: 50
 mixup_strength: 50
 noise_probability: 50
 noise_strength: 25
-nums_process: '3'
+nums_process: 1
 opticaldistortion_probability: 50
 opticaldistortion_strength: 5
 perspective_probability: 50

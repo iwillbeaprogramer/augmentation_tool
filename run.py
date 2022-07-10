@@ -5,7 +5,7 @@ import multiprocessing
 from qt_material import apply_stylesheet
 import yaml
 
-from instance_segmentation.tab import InstanceSegmentation_Tab
+from instance_segmentation import InstanceSegmentation_Tab
 from object_detection.tab import OjbectDetection_Tab
 
 
