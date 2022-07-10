@@ -4,7 +4,8 @@ import os
 import random
 import copy
 import albumentations as A
-
+import gdown
+import zipfile
 def masks_sum(masks):
     if len(masks)>=2:
         masks[1] += masks[0]
@@ -14,6 +15,13 @@ def masks_sum(masks):
     else:
         return masks[0]
 
+def mixupdata_download():
+    google_path = 'https://drive.google.com/uc?id='
+    file_id = '1_GIB9z5vH6sZasWkRNf0LcfPJvCjQWFa'
+    output = '../mixupdata.zip'
+    gdown.download(google_path+file_id,output,quiet=False,verify=False,)
+    zip = zipfile.ZipFile("../mixupdata.zip").extractall("../")
+    
 def random_background_change(image,masks,labels,p=0.5,patch_image=None,):
     if random.random()<p:
         return image,masks,labels
