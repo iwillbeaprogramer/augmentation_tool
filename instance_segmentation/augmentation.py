@@ -23,9 +23,11 @@ def mixupdata_download():
     zip = zipfile.ZipFile("../mixupdata.zip").extractall("../")
     
 def random_background_change(image,masks,labels,p=0.5,patch_image=None,):
+    print(len(os.listdir(patch_image)))
     if random.random()<p:
         return image,masks,labels
     else:
+        print("일단 여기 들어왔는데??????????????")
         if patch_image is not None:
             patch_nums = random.randint(1,10)
             result_image = image.copy()

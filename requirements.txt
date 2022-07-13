@@ -1,0 +1,5 @@
+albumentations
+gdown
+opencv-python
+tqdm
+PySide6

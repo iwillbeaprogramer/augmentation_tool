@@ -337,12 +337,18 @@ class InstanceSegmentation_Tab(QFrame):
             )
             
         if self.background_checkbox.isChecked(): # X
+            if self.background_slider_probability.value()/100>1e-3:
+                if self.background_path is None:
+                    # print("!?!?!?")
+                    if not os.path.isdir("../mixup_data"):
+                        mixupdata_download()
+                    self.background_path = "../mixup_data"
             custom_pipeline.append(
                 [
                     random_background_change,
                     {
                         "p":self.background_slider_probability.value()/100,
-                        "patch_image":self.images_for_aug
+                        "patch_image":self.background_path
                     }
                 ]
             )
