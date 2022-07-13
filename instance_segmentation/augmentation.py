@@ -23,19 +23,19 @@ def mixupdata_download():
     zip = zipfile.ZipFile("../mixupdata.zip").extractall("../")
     
 def random_background_change(image,masks,labels,p=0.5,patch_image=None,):
-    print(len(os.listdir(patch_image)))
-    if random.random()<p:
+    if random.random()>p:
         return image,masks,labels
     else:
-        print("일단 여기 들어왔는데??????????????")
         if patch_image is not None:
+            temp = os.listdir(patch_image)
+            temp = [ os.path.join(patch_image,filename) for filename in temp]
             patch_nums = random.randint(1,10)
             result_image = image.copy()
             result_masks = copy.deepcopy(masks)
             instances = masks_sum(result_masks)
             background = 255-instances
-            random_indexes = np.random.choice(len(patch_image)-1,patch_nums)
-            patch_images = [ cv2.imread(patch_image[random_index]) for random_index in random_indexes]
+            random_indexes = np.random.choice(len(temp)-1,patch_nums)
+            patch_images = [ cv2.imread(temp[random_index]) for random_index in random_indexes]
             xs,ys = np.where(background[:,:,]==255)
             position_indexs = np.random.choice(len(xs)-1,patch_nums)
             positions = [ (xs[i],ys[i]) for i in position_indexs]
@@ -98,7 +98,7 @@ def random_background_change(image,masks,labels,p=0.5,patch_image=None,):
 
 
 def random_dropout(image,masks,labels,p=0.5,min_instance=1,max_instance=5,mixup_image=False):
-    if random.random()<p:
+    if random.random()>p:
         return image,masks,labels
     else:
         return_image = image.copy()
@@ -283,8 +283,7 @@ def make_gradation_images(rgb=(255,255,255)):
 
 def random_gradation(image,masks,labels,p=0.5,gradation_intensity=0.25,):
     make_gradation_images()
-    possibility = random.random()
-    if p<possibility:
+    if random.random()<p:
         gradation_image_path = "./gradation_images"
         image_list = os.listdir(gradation_image_path)
         randomindex = random.randint(0,len(image_list)-1)
