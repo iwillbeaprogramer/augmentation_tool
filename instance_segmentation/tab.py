@@ -280,10 +280,6 @@ class InstanceSegmentation_Tab(QFrame):
                     annotation_number+=1
                     del x,y,w,h,area,seg
                     number+=1
-                    if one_category_num==0:
-                        cv2.drawContours(result_image,[polygon],-1,(255,0,0),thickness=2,)
-                    else:
-                        cv2.drawContours(result_image,[polygon],-1,(0,0,255),thickness=2,)
                 cv2.imwrite(full_save_path+"/{}.jpg".format(t),result_image)
                 images.append({
                         "height":result_image.shape[0],
