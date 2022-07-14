@@ -97,6 +97,7 @@ def random_background_change(image,masks,labels,p=0.5,patch_image=None,):
             return result_image,masks,labels
 
 
+
 def random_dropout(image,masks,labels,p=0.5,min_instance=1,max_instance=5,mixup_image=False):
     if random.random()>p:
         return image,masks,labels
@@ -362,3 +363,42 @@ def random_grid_distortion(image,masks,labels,p=0.5,distort_intensity=0.20,):
             
     else:
         return image,masks,labels
+    
+    
+def random_mosaic(image_list,masks_list,labels_list,p=0.5,option = "resize"):
+    if False:
+    # if p<random.random():
+        return image_list[0],masks_list[0],labels_list[0]
+    else:
+        temp = list(range(4))
+        np.random.shuffle(temp)
+        if option =='crop':
+            
+            return
+        else:
+            h = max([ image_list[index].shape[0] for index in temp ])
+            w = max([ image_list[index].shape[1] for index in temp ])
+            black = np.zeros((h,w)).astype(np.uint8)
+            center_x = round(w*0.5 + w*(np.random.uniform()*0.2-0.1))
+            center_y = round(h*0.5 + h*(np.random.uniform()*0.2-0.1))
+            # x,y,w,h
+            last_masks = []
+            last_labels = []
+            image_sizes=[(0,0,center_x,center_y),(center_x,0,w-center_x,center_y),(0,center_y,center_x,h-center_y),(center_x,center_y,w-center_x,h-center_y)]
+            for index,size in enumerate(image_sizes):
+                target_image = image_list[temp[index]]
+                target_masks = masks_list[temp[index]]
+                target_labels = labels_list[temp[index]]
+                image_list[temp[index]] = cv2.resize(target_image,size[2:4])
+                for mask_index,mask in enumerate(target_masks):
+                    black = np.zeros((h,w)).astype(np.uint8)
+                    dummy=cv2.resize(mask,size[2:4])
+                    black[size[1]:size[1]+size[3],size[0]:size[0]+size[2]]=dummy
+                    last_masks.append(black)
+                    last_labels.append(labels_list[temp[index]][mask_index])
+                
+                    
+            t1 = np.concatenate([image_list[temp[0]],image_list[temp[1]]],axis=1)
+            t2 = np.concatenate([image_list[temp[2]],image_list[temp[3]]],axis=1)
+            last_image = np.concatenate([t1,t2],axis=0)
+            return last_image,last_masks,last_labels

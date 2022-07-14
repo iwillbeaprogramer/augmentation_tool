@@ -247,6 +247,16 @@ class InstanceSegmentation_Tab(QFrame):
                 folder_count+=1
         for index,item in enumerate(coco_data):
             pre_image_origin,pre_masks_origin,pre_categories_about_one_mask = item
+            #############################
+            a = np.random.choice(range(len(coco_data)),3)
+            i0,m0,l0 = coco_data[a[0]]
+            i1,m1,l1 = coco_data[a[1]]
+            i2,m2,l2 = coco_data[a[2]]
+            images_list = [pre_image_origin,i0,i1,i2]
+            masks_list = [pre_masks_origin,m0,m1,m2]
+            labels_list = [pre_categories_about_one_mask,l0,l1,l2]
+            pre_image_origin,pre_masks_origin,pre_categories_about_one_mask = random_mosaic(images_list,masks_list,labels_list)
+            #############################
             for j in range(int(self.line_edit.text())):
                 t = "_".join(str(time.time()).split("."))
                 result_image = copy.deepcopy(pre_image_origin)
@@ -257,8 +267,7 @@ class InstanceSegmentation_Tab(QFrame):
                 for polygon,one_category_num in zip(result_polygons,result_categories_about_one_mask):
                     x,y,w,h = cv2.boundingRect(polygon)
                     area = int(cv2.contourArea(polygon))
-                    seg = [ int(i) for i in polygon.reshape(-1)]
-                    # seg = list(polygon.reshape(-1))
+                    seg = [ int(i) for i in polygon[::4,:].reshape(-1)]
                     annotations.append({
                         "iscrowd":0,
                         "image_id":number,
@@ -270,16 +279,25 @@ class InstanceSegmentation_Tab(QFrame):
                     })
                     annotation_number+=1
                     del x,y,w,h,area,seg
+                    number+=1
+                    if one_category_num==0:
+                        cv2.drawContours(result_image,[polygon],-1,(255,0,0),thickness=2,)
+                    else:
+                        cv2.drawContours(result_image,[polygon],-1,(0,0,255),thickness=2,)
+                cv2.imwrite(full_save_path+"/{}.jpg".format(t),result_image)
                 images.append({
                         "height":result_image.shape[0],
                         "width":result_image.shape[1],
                         "id":number,
                         "file_name":t+".jpg",
                     })
-                number+=1
-                # cv2.drawContours(result_image,result_polygons,-1,(255,0,0),thickness=2,)
-                cv2.imwrite(full_save_path+"/{}.jpg".format(t),result_image)
                 del result_image,result_masks, result_polygons,result_categories_about_one_mask
+                
+            try:
+                del i0,i1,i2,m0,m1,m2,l0,l1,l2
+            except:
+                pass
+            
         result_object = {
             "images":images,
             "annotations":annotations,
@@ -308,9 +326,11 @@ class InstanceSegmentation_Tab(QFrame):
                 image = transformed['image']
                 masks = transformed['masks']
             else:
-                # image,masks = self.custom_pipeline[index][0](image,masks=masks,p=self.custom_pipeline[index][1],)
                 image,masks,labels = self.custom_pipeline[index][0](image,masks,labels,**self.custom_pipeline[index][1])
         return image,masks,labels
+    
+    def preprocess(self,images_list,masks_list,labels_list):
+        return images_list,masks_list,labels_list
         
     def make_custom_aug_pipeline(self):
         custom_pipeline=[]
