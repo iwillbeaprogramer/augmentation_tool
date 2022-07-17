@@ -54,6 +54,7 @@ class InstanceSegmentation_Tab(QFrame):
         self.make_noise_aug()
         self.make_horizental_flip_aug()
         self.make_vertical_flip_aug()
+        self.make_random_mosaic_aug()
         self.make_downscale_aug()
         self.make_mixup_aug()
         self.make_colorjitter_aug()
@@ -106,6 +107,9 @@ class InstanceSegmentation_Tab(QFrame):
             self.noise_slider_probability.setValue(self.log["noise_probability"]),
             self.noise_slider.setValue(self.log["noise_strength"]),
             self.noise_checkbox.setChecked(self.log["noise_apply"])
+            
+            self.mosaic_slider_probability.setValue(self.log["mosaic_probability"])
+            self.mosaic_checkbox.setChecked(self.log["mosaic_apply"])
             
             self.horizentalflip_slider_probability.setValue(self.log["horizentalflip_probability"]),
             self.horizentalflip_checkbox.setChecked(self.log["horizentalflip_apply"])
@@ -178,6 +182,9 @@ class InstanceSegmentation_Tab(QFrame):
             "noise_probability":self.noise_slider_probability.value(),
             "noise_strength":self.noise_slider.value(),
             "noise_apply":self.noise_checkbox.isChecked(),
+            
+            "mosaic_probability":self.mosaic_slider_probability.value(),
+            "mosaic_apply":self.mosaic_checkbox.isChecked(),
             
             "horizentalflip_probability":self.horizentalflip_slider_probability.value(),
             "horizentalflip_apply":self.horizentalflip_checkbox.isChecked(),
@@ -742,7 +749,18 @@ class InstanceSegmentation_Tab(QFrame):
         self.grid_layout.addWidget(self.verticalflip_checkbox,self.aug_count,0)
         self.grid_layout.addWidget(self.verticalflip_slider_probability,self.aug_count,1)
         self.aug_count+=1
-        
+    
+    def make_random_mosaic_aug(self):
+        self.mosaic_checkbox = QCheckBox("Random Mosaic")
+        self.mosaic_checkbox.setCheckable(True)
+        self.mosaic_slider_probability = QSlider(Qt.Horizontal)
+        self.mosaic_slider_probability.setRange(0,100)
+        self.mosaic_slider_probability.setValue(50)
+        self.probatility_list.append(self.mosaic_slider_probability)
+        self.grid_layout.addWidget(self.mosaic_checkbox,self.aug_count,0)
+        self.grid_layout.addWidget(self.mosaic_slider_probability,self.aug_count,1)
+        self.aug_count+=1
+    
     def make_downscale_aug(self):
         self.downscale_checkbox = QCheckBox("Random DownScale")
         self.downscale_checkbox.setChecked(True)
@@ -859,3 +877,5 @@ class InstanceSegmentation_Tab(QFrame):
         self.grid_layout.addWidget(self.perspective_slider_probability,self.aug_count,1)
         self.grid_layout.addWidget(self.perspective_slider,self.aug_count,2)
         self.aug_count+=1
+        
+        
