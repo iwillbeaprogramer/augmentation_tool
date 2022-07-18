@@ -366,8 +366,7 @@ def random_grid_distortion(image,masks,labels,p=0.5,distort_intensity=0.20,):
     
     
 def random_mosaic(image_list,masks_list,labels_list,p=0.5,option = "resize"):
-    if False:
-    # if p<random.random():
+    if p<random.random():
         return image_list[0],masks_list[0],labels_list[0]
     else:
         temp = list(range(4))
@@ -379,8 +378,8 @@ def random_mosaic(image_list,masks_list,labels_list,p=0.5,option = "resize"):
             h = max([ image_list[index].shape[0] for index in temp ])
             w = max([ image_list[index].shape[1] for index in temp ])
             black = np.zeros((h,w)).astype(np.uint8)
-            center_x = round(w*0.5 + w*(np.random.uniform()*0.2-0.1))
-            center_y = round(h*0.5 + h*(np.random.uniform()*0.2-0.1))
+            center_x = round(w*0.5 + w*(np.random.uniform()*0.3-0.15))
+            center_y = round(h*0.5 + h*(np.random.uniform()*0.3-0.15))
             # x,y,w,h
             last_masks = []
             last_labels = []

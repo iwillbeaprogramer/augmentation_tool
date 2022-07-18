@@ -236,6 +236,7 @@ class InstanceSegmentation_Tab(QFrame):
                 raise Exception("이미지폴더 경로가 유효하지않음")
         else:
             raise Exception("라벨파일의 경로가 유효하지않음")
+        self.make_preprocessing_pipeline()
         self.make_albumentation_pipeline()
         self.make_custom_aug_pipeline()
         images=[]
@@ -255,14 +256,6 @@ class InstanceSegmentation_Tab(QFrame):
         for index,item in enumerate(coco_data):
             pre_image_origin,pre_masks_origin,pre_categories_about_one_mask = item
             #############################
-            a = np.random.choice(range(len(coco_data)),3)
-            i0,m0,l0 = coco_data[a[0]]
-            i1,m1,l1 = coco_data[a[1]]
-            i2,m2,l2 = coco_data[a[2]]
-            images_list = [pre_image_origin,i0,i1,i2]
-            masks_list = [pre_masks_origin,m0,m1,m2]
-            labels_list = [pre_categories_about_one_mask,l0,l1,l2]
-            pre_image_origin,pre_masks_origin,pre_categories_about_one_mask = random_mosaic(images_list,masks_list,labels_list)
             #############################
             for j in range(int(self.line_edit.text())):
                 t = "_".join(str(time.time()).split("."))
@@ -316,7 +309,11 @@ class InstanceSegmentation_Tab(QFrame):
             self.AUGMENTATION_RUN()
         else:
             main()
-        
+            
+    def execute_one_preprocessing(self,image,mask,labels):
+        random.shuffle(self.preprocessing_pipeline)
+        for item in self.preprocessing_pipeline:
+            item[0](image,mask,labels,**item[1])
 
     def execute_one_aug(self,image,masks,labels):
         random.shuffle(self.custom_pipeline)
@@ -332,8 +329,8 @@ class InstanceSegmentation_Tab(QFrame):
                 image,masks,labels = self.custom_pipeline[index][0](image,masks,labels,**self.custom_pipeline[index][1])
         return image,masks,labels
     
-    def preprocess(self,images_list,masks_list,labels_list):
-        return images_list,masks_list,labels_list
+    
+    
         
     def make_custom_aug_pipeline(self):
         custom_pipeline=[]
