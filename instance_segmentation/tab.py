@@ -256,6 +256,14 @@ class InstanceSegmentation_Tab(QFrame):
         for index,item in enumerate(coco_data):
             pre_image_origin,pre_masks_origin,pre_categories_about_one_mask = item
             #############################
+            a = np.random.choice(range(len(coco_data)),3)
+            i0,m0,l0 = coco_data[a[0]]
+            i1,m1,l1 = coco_data[a[1]]
+            i2,m2,l2 = coco_data[a[2]]
+            images_list = [pre_image_origin,i0,i1,i2]
+            masks_list = [pre_masks_origin,m0,m1,m2]
+            labels_list = [pre_categories_about_one_mask,l0,l1,l2]
+            pre_image_origin,pre_masks_origin,pre_categories_about_one_mask = random_mosaic(images_list,masks_list,labels_list)
             #############################
             for j in range(int(self.line_edit.text())):
                 t = "_".join(str(time.time()).split("."))
@@ -331,6 +339,18 @@ class InstanceSegmentation_Tab(QFrame):
     
     
     
+    def make_preprocessing_pipeline(self):
+        preprocessing_pipeline = []
+        if self.mosaic_checkbox.isChecked():
+            preprocessing_pipeline.append(
+                [
+                    random_mosaic,
+                    {
+                        "p":self.mosaic_slider_probability.value()/100
+                    }
+                ]
+            )
+        self.preprocessing_pipeline = preprocessing_pipeline
         
     def make_custom_aug_pipeline(self):
         custom_pipeline=[]
@@ -750,6 +770,7 @@ class InstanceSegmentation_Tab(QFrame):
     def make_random_mosaic_aug(self):
         self.mosaic_checkbox = QCheckBox("Random Mosaic")
         self.mosaic_checkbox.setCheckable(True)
+        self.mosaic_checkbox.setChecked(True)
         self.mosaic_slider_probability = QSlider(Qt.Horizontal)
         self.mosaic_slider_probability.setRange(0,100)
         self.mosaic_slider_probability.setValue(50)

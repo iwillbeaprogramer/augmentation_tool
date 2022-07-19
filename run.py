@@ -19,7 +19,7 @@ class Main_window(QMainWindow):
         tabs = QTabWidget()
         self.setCentralWidget(tabs)
         self.instance_seg_tab = InstanceSegmentation_Tab(self.WIDTH,self.HEIGHT)
-        object_detection_tap = OjbectDetection_Tab()
+        object_detection_tap = OjbectDetection_Tab(self.WIDTH,self.HEIGHT)
         tabs.addTab(self.instance_seg_tab,"Instance Segmentation")
         tabs.addTab(object_detection_tap,"Object Detection")
         
