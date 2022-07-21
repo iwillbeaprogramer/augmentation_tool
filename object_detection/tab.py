@@ -22,7 +22,6 @@ class OjbectDetection_Tab(QFrame):
         self.images_for_aug = None
         self.probatility_list=[]
         
-        self.load_log()
         
 
         self.make_select_images_directory_button()
@@ -34,6 +33,7 @@ class OjbectDetection_Tab(QFrame):
         self.make_mixup_aug()
         self.make_random_brighitness()
         self.make_blur_aug()
+        self.make_noise_aug()
         self.make_colorjitter_aug()
         self.make_downscale_aug()
         self.make_gradation_aug()
@@ -42,9 +42,9 @@ class OjbectDetection_Tab(QFrame):
         self.make_affine_aug()
         self.make_perspective_aug()
         
+        self.load_log()
         
         self.make_run_button()
-        self.save_log()
             
     def make_random_brighitness(self):
         self.brightness_checkbox = QCheckBox("Random Brightness")
@@ -229,7 +229,8 @@ class OjbectDetection_Tab(QFrame):
         
     def make_run_button(self):
         run_button = QPushButton("Aug 실행")
-        run_button.clicked.connect(self.MULTI_AUGMENTATION_RUN)
+        # run_button.clicked.connect(self.MULTI_AUGMENTATION_RUN)
+        run_button.clicked.connect(self.save_log)
         self.grid_layout.addWidget(run_button,self.aug_count,0,1,3)
         self.aug_count+=1
         self.start_time = time.time()
@@ -278,6 +279,54 @@ class OjbectDetection_Tab(QFrame):
             "labels_folder":self.labels_folder if self.labels_folder else None,
             "save_folder":self.save_folder if self.save_folder else None,
             "images_for_aug":self.images_for_aug if self.images_for_aug else None,
+            
+            # Albumentations
+            "blur_probability":self.blur_slider_probability.value(),
+            "blur_strength":self.blur_slider.value(),
+            "blur_apply":self.blur_checkbox.isChecked(),
+            
+            # Albumentations
+            "noise_probability":self.noise_slider_probability.value(),
+            "noise_strength":self.noise_slider.value(),
+            "noise_apply":self.noise_checkbox.isChecked(),
+            
+            # Albumentations
+            "downscale_probability":self.downscale_slider_probability.value(),
+            "downscale_strength":self.downscale_slider.value(),
+            "downscale_apply":self.downscale_checkbox.isChecked(),
+            
+            # custom
+            "mixup_probability":self.mixup_slider_probability.value(),
+            "mixup_strength":self.mixup_slider.value(),
+            "mixup_apply":self.mixup_checkbox.isChecked(),
+            
+            # Albumentations
+            "colorjitter_probability":self.colorjitter_slider_probability.value(),
+            "colorjitter_strength":self.colorjitter_slider.value(),
+            "colorjitter_apply":self.colorjitter_checkbox.isChecked(),
+            
+            # Albumentations
+            "horizentalflip_probability":self.horizentalflip_slider_probability.value(),
+            "horizentalflip_apply":self.horizentalflip_checkbox.isChecked(),
+            
+            # Albumentations
+            "verticalflip_probability":self.verticalflip_slider_probability.value(),
+            "verticalflip_apply":self.verticalflip_checkbox.isChecked(),
+            
+            # custom
+            "gradation_probability":self.gradation_slider_probability.value(),
+            "gradation_strength":self.gradation_slider.value(),
+            "gradation_apply":self.gradation_checkbox.isChecked(),
+            
+            # Albumentations
+            "affine_probability":self.affine_slider_probability.value(),
+            "affine_strength":self.affine_slider.value(),
+            "affine_apply":self.affine_checkbox.isChecked(),
+            
+            # Albumentations
+            "perspective_probability":self.perspective_slider_probability.value(),
+            "perspective_strength":self.perspective_slider.value(),
+            "perspective_apply":self.perspective_checkbox.isChecked(),
         }
         with open("object_detection/object_detection_log.yaml","w") as f:
             yaml.dump(log,f)
@@ -290,6 +339,44 @@ class OjbectDetection_Tab(QFrame):
             self.labels_folder = self.log["labels_folder"]
             self.save_folder = self.log["save_folder"]
             self.images_for_aug = self.log["images_for_aug"]
+            
+            self.blur_slider_probability.setValue(self.log["blur_probability"])
+            self.blur_slider = self.log["blur_strength"]
+            self.blur_checkbox = self.log["blur_apply"]
+
+            self.noise_slider_probability.setValue(self.log["noise_probability"])
+            self.noise_slider = self.log["noise_strength"]
+            self.noise_checkbox = self.log["noise_apply"]
+
+            self.downscale_slider_probability.setValue(self.log["downscale_probability"])
+            self.downscale_slider = self.log["downscale_strength"]
+            self.downscale_checkbox = self.log["downscale_apply"]
+            
+            self.mixup_slider_probability.setValue(self.log["mixup_probability"])
+            self.mixup_slider = self.log["mixup_strength"]
+            self.mixup_checkbox = self.log["mixup_apply"]
+
+            self.colorjitter_slider_probability.setValue(self.log["colorjitter_probability"])
+            self.colorjitter_slider = self.log["colorjitter_strength"]
+            self.colorjitter_checkbox = self.log["colorjitter_apply"]
+
+            self.horizentalflip_slider_probability.setValue(self.log["horizentalflip_probability"])
+            self.horizentalflip_checkbox = self.log["horizentalflip_apply"]
+            
+            self.verticalflip_slider_probability.setValue(self.log["verticalflip_probability"])
+            self.verticalflip_checkbox = self.log["verticalflip_apply"]
+            
+            self.gradation_slider_probability.setValue(self.log["gradation_probability"])
+            self.gradation_slider = self.log["gradation_strength"]
+            self.gradation_checkbox = self.log["gradation_apply"]
+
+            self.affine_slider_probability.setValue(self.log["affine_probability"])
+            self.affine_slider = self.log["affine_strength"]
+            self.affine_checkbox = self.log["affine_apply"]
+            
+            self.perspective_slider_probability.setValue(self.log["perspective_probability"])
+            self.perspective_slider = self.log["perspective_strength"]
+            self.perspective_checkbox = self.log["perspective_apply"]
             
     
     def make_about_menu(self,maximum_height=30):

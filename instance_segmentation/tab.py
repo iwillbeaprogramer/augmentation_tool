@@ -208,15 +208,15 @@ class InstanceSegmentation_Tab(QFrame):
             "opticaldistortion_strength":self.optical_slider.value(),
             "opticaldistortion_apply":self.optical_checkbox.isChecked(),
             
-            "gradation_probability":self.resize_slider_probability.value(),
+            "gradation_probability":self.gradation_slider_probability.value(),
             "gradation_strength":self.gradation_slider.value(),
             "gradation_apply":self.gradation_checkbox.isChecked(),
             
-            "affine_probability":self.resize_slider_probability.value(),
+            "affine_probability":self.affine_slider_probability.value(),
             "affine_strength":self.affine_slider.value(),
             "affine_apply":self.affine_checkbox.isChecked(),
             
-            "perspective_probability":self.resize_slider_probability.value(),
+            "perspective_probability":self.perspective_slider_probability.value(),
             "perspective_strength":self.perspective_slider.value(),
             "perspective_apply":self.perspective_checkbox.isChecked(),
         }
